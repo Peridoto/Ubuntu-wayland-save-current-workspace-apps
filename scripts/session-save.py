@@ -188,12 +188,24 @@ def classify(window, cmdline, nautilus_dirs):
         for a in cmdline:
             if a.startswith('--profile-directory='):
                 return a.split('=', 1)[1]
+            # Some apps (Edge) put all args in one string
+            if '--profile-directory=' in a and not a.startswith('--profile'):
+                import re as _re
+                m = _re.search(r'--profile-directory=(\S+)', a)
+                if m:
+                    return m.group(1)
         return None
 
     def _app_id():
         for a in cmdline:
             if a.startswith('--app-id='):
                 return a.split('=', 1)[1]
+            # Some apps (Edge) put all args in one string
+            if '--app-id=' in a and not a.startswith('--app-id'):
+                import re as _re
+                m = _re.search(r'--app-id=(\S+)', a)
+                if m:
+                    return m.group(1)
         return None
 
     # ── Google Chrome ────────────────────────────────────
