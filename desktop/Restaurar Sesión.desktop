@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Restaurar Sesión
+Comment=Restaura las ventanas guardadas en sus escritorios virtuales
+Icon=view-refresh
+Exec=bash -c 'python3 ~/.local/bin/session-restore.py; echo; echo "Presiona Enter para cerrar"; read'
+Terminal=true
+Categories=Utility;
+StartupNotify=false

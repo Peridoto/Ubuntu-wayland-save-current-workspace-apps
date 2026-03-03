@@ -1,0 +1,7 @@
+{
+  "uuid": "session-saver@pc",
+  "name": "Session Saver",
+  "description": "Expone ventanas y escritorios via D-Bus para guardar/restaurar sesión",
+  "shell-version": ["49"],
+  "version": 1
+}
