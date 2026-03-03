@@ -146,6 +146,22 @@ def resolve_text_editor_title(title):
       "archivo.txt (Borrador) - Editor de texto"        -> borrador sin guardar
       "archivo.txt - Editor de texto"                   -> buscar en ~
     """
+
+
+def _get_chrome_active_profiles():
+    """Lee Local State de Chrome para obtener los perfiles activos."""
+    local_state = Path.home() / '.config' / 'google-chrome' / 'Local State'
+    if not local_state.exists():
+        return []
+    try:
+        with open(local_state) as f:
+            state = json.load(f)
+        profiles = state.get('profile', {}).get('last_active_profiles', [])
+        return profiles if profiles else ['Default']
+    except Exception:
+        return ['Default']
+
+
     title = re.sub(r'\s*-\s*(Editor de texto|Text Editor)\s*$', '', title).strip()
     m = re.match(r'^(.+?)\s+\((.+)\)$', title)
     if m:
@@ -218,6 +234,7 @@ def classify(window, cmdline, nautilus_dirs):
         p = _profile()
         if p:
             e['profile'] = p
+        # Profile will be resolved later via Local State if not found
         return e
 
     # ── Brave ────────────────────────────────────────────
@@ -402,6 +419,18 @@ def main():
         session.append(entry)
 
     session.sort(key=lambda x: x.get('workspace', 0))
+
+    # 3b. Resolver perfiles de Chrome cuando cmdline no los expone
+    #     Lee Local State para saber qué perfiles están activos y los
+    #     asigna a las ventanas (round-robin si hay más ventanas que perfiles)
+    chrome_entries = [s for s in session
+                      if s.get('app_type') == 'chrome' and 'profile' not in s]
+    if chrome_entries:
+        active_profiles = _get_chrome_active_profiles()
+        if active_profiles:
+            # Asignar un perfil a cada ventana de Chrome (round-robin)
+            for i, entry in enumerate(chrome_entries):
+                entry['profile'] = active_profiles[i % len(active_profiles)]
 
     # 4. Deduplicar: navegadores con mismo perfil en el MISMO escritorio
     #    Chrome restaura sus pestañas automáticamente, solo necesitamos
