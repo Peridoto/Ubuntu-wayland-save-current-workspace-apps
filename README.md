@@ -81,4 +81,4 @@ Developing for Wayland and GNOME Shell requires constant maintenance to keep up 
 
 ## License
 
-MIT
+GPL-3.0 license
