@@ -28,6 +28,15 @@ const IFACE_XML = `
       <arg type="i" direction="in" name="workspaceIndex"/>
       <arg type="i" direction="out" name="count"/>
     </method>
+    <method name="SetWindowGeometry">
+      <arg type="s" direction="in" name="wmClass"/>
+      <arg type="s" direction="in" name="titleSubstring"/>
+      <arg type="i" direction="in" name="x"/>
+      <arg type="i" direction="in" name="y"/>
+      <arg type="i" direction="in" name="w"/>
+      <arg type="i" direction="in" name="h"/>
+      <arg type="b" direction="out" name="success"/>
+    </method>
   </interface>
 </node>`;
 
@@ -110,6 +119,30 @@ class _SessionSaverDBus {
             }
         } catch (_) {}
         return count;
+    }
+
+    SetWindowGeometry(wmClass, titleSubstring, x, y, w, h) {
+        try {
+            for (const actor of global.get_window_actors()) {
+                const win = actor.meta_window;
+                if (win.get_window_type() !== Meta.WindowType.NORMAL)
+                    continue;
+                const cls = win.get_wm_class() ?? '';
+                const title = win.get_title() ?? '';
+                if (cls === wmClass &&
+                    (titleSubstring === '' || title.includes(titleSubstring))) {
+                    // Unmaximize first so move/resize takes effect
+                    if (win.get_maximized()) {
+                        win.unmaximize(Meta.MaximizeFlags.BOTH);
+                    }
+                    win.move_resize_frame(false, x, y, w, h);
+                    return true;
+                }
+            }
+            return false;
+        } catch (_) {
+            return false;
+        }
     }
 }
 

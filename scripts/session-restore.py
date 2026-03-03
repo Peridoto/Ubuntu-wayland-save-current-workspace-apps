@@ -87,6 +87,11 @@ def move_all_by_class(wm_class, workspace):
     return dbus_call('MoveAllByClass', wm_class, workspace)
 
 
+def set_geometry(wm_class, title_sub, x, y, w, h):
+    """Posiciona y redimensiona una ventana."""
+    return dbus_call('SetWindowGeometry', wm_class, title_sub, x, y, w, h)
+
+
 # ── Comprobar si un comando existe ─────────────────────────────────
 def which(cmd):
     return subprocess.run(['which', cmd], capture_output=True).returncode == 0
@@ -393,9 +398,39 @@ def main():
     time.sleep(3)
     moved += do_moves('pasada 3')
 
+    # ── Fase 3: Restaurar geometría (posición + tamaño) ───────────
+    log('\n--- Restaurando geometría (posición y tamaño) ---')
+    time.sleep(1)
+    geo_ok = 0
+    geo_fail = 0
+
+    for entry, _ in launched:
+        geo = entry.get('geometry')
+        if not geo:
+            continue
+
+        wm_class = entry.get('wm_class', '')
+        at       = entry.get('app_type', '')
+        mk       = match_key(entry)
+        title_sub = mk if mk else ''
+
+        x, y = geo.get('x', 0), geo.get('y', 0)
+        w, h = geo.get('w', 800), geo.get('h', 600)
+
+        r = set_geometry(wm_class, title_sub, x, y, w, h)
+        if '(true,)' in r.stdout:
+            geo_ok += 1
+            log(f'  Geometría OK: {at} ({x},{y} {w}x{h})')
+        else:
+            geo_fail += 1
+            log(f'  Geometría FALLO: {at} title_sub="{title_sub}" -> {r.stdout.strip()}')
+
+    log(f'\nGeometría: {geo_ok} ok, {geo_fail} fallidas')
+
     log(f'\n{"="*50}')
     log(f'Hecho. Lanzadas: {sum(1 for _,l in launched if l)}, '
-        f'movidas: {moved}, omitidas: {len(skipped)}')
+        f'movidas: {moved}, geometría: {geo_ok}/{geo_ok+geo_fail}, '
+        f'omitidas: {len(skipped)}')
 
     if skipped:
         log('Omitidas:')
