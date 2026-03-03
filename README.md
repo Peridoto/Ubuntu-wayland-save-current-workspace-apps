@@ -73,6 +73,12 @@ The restore script uses a **3-pass strategy** with delays to handle slow-launchi
 - AMD Ryzen 9 5900X, RX 6700 XT, Gigabyte B550M DS3H
 - 5 static workspaces
 
+## Support the Development ☕
+
+Developing for Wayland and GNOME Shell requires constant maintenance to keep up with new releases. If this extension saves you time and improves your workflow, please consider supporting my work:
+
+[![Buy Me A Coffee](https://img.shields.github.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/peridoto)
+
 ## License
 
 MIT
