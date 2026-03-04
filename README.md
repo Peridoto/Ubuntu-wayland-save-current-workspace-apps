@@ -8,6 +8,18 @@ Built for systems where suspend/hibernate doesn't work — shut down cleanly and
 1. **Save**: Records every open window — app type, workspace, file/folder, geometry — to a JSON file.
 2. **Restore**: Re-launches each app and moves windows back to their correct virtual desktop via D-Bus.
 
+## Why?
+
+On certain hardware combinations, **suspend (S3) and s2idle simply do not work** — the system either freezes on resume, crashes, or never wakes up at all. This is a well-known issue affecting AMD Ryzen + AMD Radeon GPU setups on Linux, particularly:
+
+- **AMD Ryzen 9 5900X** + **Radeon RX 6700 XT** + **Gigabyte B550M DS3H**
+
+Despite years of kernel patches, BIOS updates, and ACPI workarounds, S3 deep sleep and `s2idle` remain broken on these boards. The only reliable option is a **full shutdown** — but that means losing your entire workspace layout: windows, tabs, virtual desktops, everything.
+
+**This tool solves that.** Instead of fighting broken suspend, you just save your session before shutting down and restore it after booting back up. It takes seconds and gets you right back to where you were — every app, every workspace, every window in its place.
+
+If your suspend works fine, you probably don't need this. But if you've spent hours debugging `s2idle`, scrolling through `dmesg` logs full of GPU reset errors, and your PC still won't wake up — this is for you.
+
 ## Components
 
 | Path | Description |
